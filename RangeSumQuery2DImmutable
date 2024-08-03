@@ -1,0 +1,62 @@
+"""Given a 2D matrix matrix, handle multiple queries of the following type:
+
+Calculate the sum of the elements of matrix inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
+Implement the NumMatrix class:
+
+NumMatrix(int[][] matrix) Initializes the object with the integer matrix matrix.
+int sumRegion(int row1, int col1, int row2, int col2) Returns the sum of the elements of matrix inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
+You must design an algorithm where sumRegion works on O(1) time complexity.
+
+"""
+
+
+
+
+
+class NumMatrix:
+
+    def __init__(self, matrix):
+        rows = len(matrix)
+        cols = len(matrix[0])
+
+        self.prefix_matrix = [[0] * cols for _ in range(rows)]
+
+        for r in range(rows):
+            for c in range(cols):
+                if r == 0:
+                    topSum = 0
+                else:
+                # Need prefix sums on top 
+                    topSum = self.prefix_matrix[r - 1][c]
+                if c == 0:
+                    leftSum = 0
+                else:
+                    leftSum = self.prefix_matrix[r][c - 1]
+                if r > 0 and c > 0:
+                    topLeftSum = self.prefix_matrix[r - 1][c - 1]
+                else:
+                    topLeftSum = 0
+                
+                current_cell = matrix[r][c]
+
+                current_prefix_sum = topSum + leftSum + current_cell - topLeftSum
+                self.prefix_matrix[r][c] = current_prefix_sum 
+
+
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
+        bottomRight = self.prefix_matrix[row2][col2]
+        if col1 == 0:
+            bottomLeft = 0
+        else:
+            bottomLeft = self.prefix_matrix[row2][col1 - 1]
+        if row1 == 0:
+            topRight = 0
+        else:
+            topRight = self.prefix_matrix[row1 -1][col2]
+        if row1 > 0 and col1 > 0:
+            topLeft = self.prefix_matrix[row1 - 1][col1 - 1]
+        else:
+            topLeft = 0
+        
+        return bottomRight - bottomLeft - topRight + topLeft
